@@ -1,0 +1,899 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - Club Event System</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <style>
+        .sidebar {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            min-height: 100vh;
+            color: white;
+        }
+        .sidebar .nav-link {
+            color: rgba(255, 255, 255, 0.8);
+            padding: 12px 20px;
+            border-radius: 8px;
+            margin: 5px 0;
+            transition: all 0.3s ease;
+        }
+        .sidebar .nav-link:hover,
+        .sidebar .nav-link.active {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+        }
+        .main-content {
+            background: #f8f9fa;
+            min-height: 100vh;
+        }
+        .card {
+            border: none;
+            border-radius: 15px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+        }
+        .card:hover {
+            transform: translateY(-5px);
+        }
+        .stats-card {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            color: white;
+        }
+        .btn-custom {
+            background: linear-gradient(45deg, #28a745, #20c997);
+            border: none;
+            border-radius: 8px;
+            color: white;
+            padding: 8px 20px;
+            transition: all 0.3s ease;
+        }
+        .btn-custom:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            color: white;
+        }
+        .modal-content {
+            border-radius: 15px;
+            border: none;
+        }
+        .form-control {
+            border-radius: 8px;
+            border: 2px solid #e9ecef;
+            transition: all 0.3s ease;
+        }
+        .form-control:focus {
+            border-color: #28a745;
+            box-shadow: 0 0 0 0.2rem rgba(40, 167, 69, 0.25);
+        }
+        .table th {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            color: white;
+            border: none;
+        }
+        .badge-custom {
+            background: linear-gradient(45deg, #28a745, #20c997);
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Sidebar -->
+            <div class="col-md-3 col-lg-2 sidebar p-0">
+                <div class="p-3">
+                    <h4 class="text-center mb-4">
+                        <i class="fas fa-user-shield me-2"></i>
+                        Admin Portal
+                    </h4>
+                    <nav class="nav flex-column">
+                        <a class="nav-link active" href="#dashboard" onclick="showSection('dashboard')">
+                            <i class="fas fa-tachometer-alt me-2"></i>Dashboard
+                        </a>
+                        <a class="nav-link" href="#events" onclick="showSection('events')">
+                            <i class="fas fa-calendar-alt me-2"></i>My Events
+                        </a>
+                        <a class="nav-link" href="#create-event" onclick="showSection('create-event')">
+                            <i class="fas fa-plus-circle me-2"></i>Create Event
+                        </a>
+                        <a class="nav-link" href="#participants" onclick="showSection('participants')">
+                            <i class="fas fa-users me-2"></i>Participants
+                        </a>
+                        <a class="nav-link" href="#certificates" onclick="showSection('certificates')">
+                            <i class="fas fa-certificate me-2"></i>Certificates
+                        </a>
+                        <a class="nav-link" href="#students" onclick="showSection('students')">
+                            <i class="fas fa-user-graduate me-2"></i>Students
+                        </a>
+                        <a class="nav-link" href="#manage-admins" onclick="showSection('manage-admins')">
+                            <i class="fas fa-user-cog me-2"></i>Manage Admins
+                        </a>
+                        <hr class="my-3">
+                        <a class="nav-link" href="#" onclick="logout()">
+                            <i class="fas fa-sign-out-alt me-2"></i>Logout
+                        </a>
+                    </nav>
+                </div>
+            </div>
+
+            <!-- Main Content -->
+            <div class="col-md-9 col-lg-10 main-content">
+                <div class="p-4">
+                    <!-- Header -->
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h2 id="page-title">Dashboard</h2>
+                        <div class="d-flex align-items-center">
+                            <span class="me-3">Welcome, <span id="user-name">Admin</span></span>
+                            <div class="badge badge-custom fs-6">Admin</div>
+                        </div>
+                    </div>
+
+                    <!-- Dashboard Section -->
+                    <div id="dashboard-section" class="content-section">
+                        <!-- Stats Cards -->
+                        <div class="row mb-4">
+                            <div class="col-md-3">
+                                <div class="card stats-card">
+                                    <div class="card-body text-center">
+                                        <i class="fas fa-calendar-plus fa-2x mb-2"></i>
+                                        <h5 id="total-events">0</h5>
+                                        <p class="mb-0">Total Events</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="card stats-card">
+                                    <div class="card-body text-center">
+                                        <i class="fas fa-user-graduate fa-2x mb-2"></i>
+                                        <h5 id="total-students">0</h5>
+                                        <p class="mb-0">Total Students</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="card stats-card">
+                                    <div class="card-body text-center">
+                                        <i class="fas fa-calendar-check fa-2x mb-2"></i>
+                                        <h5 id="upcoming-events">0</h5>
+                                        <p class="mb-0">Upcoming Events</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="card stats-card">
+                                    <div class="card-body text-center">
+                                        <i class="fas fa-check-circle fa-2x mb-2"></i>
+                                        <h5 id="completed-events">0</h5>
+                                        <p class="mb-0">Completed Events</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Recent Events -->
+                        <div class="row">
+                            <div class="col-lg-8">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h5 class="mb-0"><i class="fas fa-calendar-alt me-2"></i>Recent Events</h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <div id="recent-events">
+                                            <div class="text-center">
+                                                <div class="spinner-border text-success" role="status">
+                                                    <span class="visually-hidden">Loading...</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-4">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h5 class="mb-0"><i class="fas fa-chart-pie me-2"></i>Quick Actions</h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="d-grid gap-2">
+                                            <button class="btn btn-custom" onclick="showSection('create-event')">
+                                                <i class="fas fa-plus me-2"></i>Create New Event
+                                            </button>
+                                            <button class="btn btn-outline-success" onclick="showSection('participants')">
+                                                <i class="fas fa-users me-2"></i>View Participants
+                                            </button>
+                                            <button class="btn btn-outline-success" onclick="showSection('certificates')">
+                                                <i class="fas fa-certificate me-2"></i>Manage Certificates
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Events Section -->
+                    <div id="events-section" class="content-section" style="display: none;">
+                        <div class="card">
+                            <div class="card-header d-flex justify-content-between align-items-center">
+                                <h5 class="mb-0"><i class="fas fa-calendar-alt me-2"></i>My Events</h5>
+                                <button class="btn btn-custom" onclick="showSection('create-event')">
+                                    <i class="fas fa-plus me-2"></i>Create Event
+                                </button>
+                            </div>
+                            <div class="card-body">
+                                <div id="my-events">
+                                    <div class="text-center">
+                                        <div class="spinner-border text-success" role="status">
+                                            <span class="visually-hidden">Loading...</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Create Event Section -->
+                    <div id="create-event-section" class="content-section" style="display: none;">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="mb-0"><i class="fas fa-plus-circle me-2"></i>Create New Event</h5>
+                            </div>
+                            <div class="card-body">
+                                <form id="create-event-form">
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="mb-3">
+                                                <label for="event-title" class="form-label">Event Title</label>
+                                                <input type="text" class="form-control" id="event-title" name="title" required>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="mb-3">
+                                                <label for="event-venue" class="form-label">Venue</label>
+                                                <input type="text" class="form-control" id="event-venue" name="venue" required>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="mb-3">
+                                                <label for="event-date" class="form-label">Date</label>
+                                                <input type="date" class="form-control" id="event-date" name="date" required>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="mb-3">
+                                                <label for="event-time" class="form-label">Time</label>
+                                                <input type="time" class="form-control" id="event-time" name="time" required>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="mb-3">
+                                                <label for="event-max-participants" class="form-label">Max Participants</label>
+                                                <input type="number" class="form-control" id="event-max-participants" name="maxParticipants" value="100">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="mb-3">
+                                                <label for="event-points" class="form-label">Points</label>
+                                                <input type="number" class="form-control" id="event-points" name="points" value="10">
+                                            </div>
+                                        </div>
+                                        <div class="col-12">
+                                            <div class="mb-3">
+                                                <label for="event-description" class="form-label">Description</label>
+                                                <textarea class="form-control" id="event-description" name="description" rows="4" required></textarea>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="d-flex gap-2">
+                                        <button type="submit" class="btn btn-custom">
+                                            <i class="fas fa-save me-2"></i>Create Event
+                                        </button>
+                                        <button type="button" class="btn btn-outline-secondary" onclick="showSection('events')">
+                                            Cancel
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Participants Section -->
+                    <div id="participants-section" class="content-section" style="display: none;">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="mb-0"><i class="fas fa-users me-2"></i>Event Participants</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="mb-3">
+                                    <label for="event-select" class="form-label">Select Event</label>
+                                    <select class="form-control" id="event-select" onchange="loadEventParticipants()">
+                                        <option value="">Choose an event...</option>
+                                    </select>
+                                </div>
+                                <div id="participants-list">
+                                    <div class="text-center text-muted">
+                                        <i class="fas fa-info-circle me-2"></i>Select an event to view participants
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Certificates Section -->
+                    <div id="certificates-section" class="content-section" style="display: none;">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="mb-0"><i class="fas fa-certificate me-2"></i>Upload Certificates</h5>
+                            </div>
+                            <div class="card-body">
+                                <form id="certificate-form">
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="mb-3">
+                                                <label for="cert-event-select" class="form-label">Select Event</label>
+                                                <select class="form-control" id="cert-event-select" required>
+                                                    <option value="">Choose an event...</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="mb-3">
+                                                <label for="cert-student-select" class="form-label">Select Student</label>
+                                                <select class="form-control" id="cert-student-select" required>
+                                                    <option value="">Choose a student...</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="col-12">
+                                            <div class="mb-3">
+                                                <label for="certificate-url" class="form-label">Certificate URL</label>
+                                                <input type="url" class="form-control" id="certificate-url" name="certificateUrl" required>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <button type="submit" class="btn btn-custom">
+                                        <i class="fas fa-upload me-2"></i>Upload Certificate
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Students Section -->
+                    <div id="students-section" class="content-section" style="display: none;">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="mb-0"><i class="fas fa-user-graduate me-2"></i>All Students</h5>
+                            </div>
+                            <div class="card-body">
+                                <div id="students-list">
+                                    <div class="text-center">
+                                        <div class="spinner-border text-success" role="status">
+                                            <span class="visually-hidden">Loading...</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Manage Admins Section -->
+                    <div id="manage-admins-section" class="content-section" style="display: none;">
+                        <div class="card">
+                            <div class="card-header d-flex justify-content-between align-items-center">
+                                <h5 class="mb-0"><i class="fas fa-user-cog me-2"></i>Manage Admin Accounts</h5>
+                                <button class="btn btn-custom" data-bs-toggle="modal" data-bs-target="#createAdminModal">
+                                    <i class="fas fa-plus me-2"></i>Create Admin
+                                </button>
+                            </div>
+                            <div class="card-body">
+                                <div id="admins-list">
+                                    <div class="text-center">
+                                        <div class="spinner-border text-success" role="status">
+                                            <span class="visually-hidden">Loading...</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Create Admin Modal -->
+    <div class="modal fade" id="createAdminModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Create New Admin</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="create-admin-form">
+                        <div class="mb-3">
+                            <label for="admin-name" class="form-label">Full Name</label>
+                            <input type="text" class="form-control" id="admin-name" name="name" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="admin-email" class="form-label">Email</label>
+                            <input type="email" class="form-control" id="admin-email" name="email" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="admin-password" class="form-label">Password</label>
+                            <input type="password" class="form-control" id="admin-password" name="password" required>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-custom" onclick="createAdmin()">Create Admin</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        let currentUser = null;
+        let authToken = null;
+
+        // Check authentication
+        window.addEventListener('load', function() {
+            authToken = localStorage.getItem('token');
+            currentUser = JSON.parse(localStorage.getItem('user'));
+            
+            if (!authToken || !currentUser || currentUser.role !== 'admin') {
+                window.location.href = 'login.html';
+                return;
+            }
+
+            // Update UI with user info
+            document.getElementById('user-name').textContent = currentUser.name;
+            
+            // Load dashboard data
+            loadDashboard();
+        });
+
+        // Navigation
+        function showSection(section) {
+            // Hide all sections
+            document.querySelectorAll('.content-section').forEach(s => s.style.display = 'none');
+            document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+            
+            // Show selected section
+            document.getElementById(`${section}-section`).style.display = 'block';
+            event.target.classList.add('active');
+            
+            // Update page title
+            const titles = {
+                'dashboard': 'Dashboard',
+                'events': 'My Events',
+                'create-event': 'Create Event',
+                'participants': 'Participants',
+                'certificates': 'Certificates',
+                'students': 'Students',
+                'manage-admins': 'Manage Admins'
+            };
+            document.getElementById('page-title').textContent = titles[section];
+            
+            // Load section data
+            switch(section) {
+                case 'events':
+                    loadMyEvents();
+                    break;
+                case 'participants':
+                    loadEventsForSelect();
+                    break;
+                case 'certificates':
+                    loadEventsForCertificates();
+                    loadStudentsForCertificates();
+                    break;
+                case 'students':
+                    loadStudents();
+                    break;
+                case 'manage-admins':
+                    loadAdmins();
+                    break;
+            }
+        }
+
+        // API calls
+        async function apiCall(url, options = {}) {
+            const defaultOptions = {
+                headers: {
+                    'Authorization': `Bearer ${authToken}`,
+                    'Content-Type': 'application/json'
+                }
+            };
+            
+            const response = await fetch(url, { ...defaultOptions, ...options });
+            
+            if (response.status === 401) {
+                localStorage.removeItem('token');
+                localStorage.removeItem('user');
+                window.location.href = 'login.html';
+                return null;
+            }
+            
+            return response;
+        }
+
+        // Load dashboard data
+        async function loadDashboard() {
+            try {
+                const [statsRes, eventsRes] = await Promise.all([
+                    apiCall('/api/admin/dashboard-stats'),
+                    apiCall('/api/admin/events')
+                ]);
+
+                if (statsRes) {
+                    const stats = await statsRes.json();
+                    document.getElementById('total-events').textContent = stats.totalEvents;
+                    document.getElementById('total-students').textContent = stats.totalStudents;
+                    document.getElementById('upcoming-events').textContent = stats.upcomingEvents;
+                    document.getElementById('completed-events').textContent = stats.completedEvents;
+                }
+
+                if (eventsRes) {
+                    const events = await eventsRes.json();
+                    displayRecentEvents(events.slice(0, 5));
+                }
+            } catch (error) {
+                console.error('Error loading dashboard:', error);
+            }
+        }
+
+        // Display recent events
+        function displayRecentEvents(events) {
+            const container = document.getElementById('recent-events');
+            
+            if (events.length === 0) {
+                container.innerHTML = '<p class="text-muted text-center">No events created yet</p>';
+                return;
+            }
+
+            container.innerHTML = events.map(event => `
+                <div class="card mb-3">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <h6 class="card-title">${event.title}</h6>
+                                <p class="card-text text-muted">${event.description}</p>
+                                <small class="text-muted">
+                                    <i class="fas fa-calendar me-1"></i>${new Date(event.date).toLocaleDateString()}
+                                    <i class="fas fa-clock me-1 ms-2"></i>${event.time}
+                                    <i class="fas fa-map-marker-alt me-1 ms-2"></i>${event.venue}
+                                </small>
+                                <div class="mt-2">
+                                    <span class="badge bg-${event.status === 'completed' ? 'success' : event.status === 'ongoing' ? 'warning' : 'primary'}">${event.status}</span>
+                                    <span class="badge bg-secondary ms-2">${event.currentParticipants}/${event.maxParticipants} participants</span>
+                                </div>
+                            </div>
+                            <div>
+                                <button class="btn btn-sm btn-outline-success" onclick="viewEventParticipants('${event._id}')">
+                                    <i class="fas fa-users me-1"></i>Participants
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Load my events
+        async function loadMyEvents() {
+            try {
+                const response = await apiCall('/api/admin/events');
+                if (response) {
+                    const events = await response.json();
+                    displayMyEvents(events);
+                }
+            } catch (error) {
+                console.error('Error loading events:', error);
+            }
+        }
+
+        // Display my events
+        function displayMyEvents(events) {
+            const container = document.getElementById('my-events');
+            
+            if (events.length === 0) {
+                container.innerHTML = '<p class="text-muted text-center">No events created yet</p>';
+                return;
+            }
+
+            container.innerHTML = events.map(event => `
+                <div class="card mb-3">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <h6 class="card-title">${event.title}</h6>
+                                <p class="card-text text-muted">${event.description}</p>
+                                <small class="text-muted">
+                                    <i class="fas fa-calendar me-1"></i>${new Date(event.date).toLocaleDateString()}
+                                    <i class="fas fa-clock me-1 ms-2"></i>${event.time}
+                                    <i class="fas fa-map-marker-alt me-1 ms-2"></i>${event.venue}
+                                </small>
+                                <div class="mt-2">
+                                    <span class="badge bg-${event.status === 'completed' ? 'success' : event.status === 'ongoing' ? 'warning' : 'primary'}">${event.status}</span>
+                                    <span class="badge bg-secondary ms-2">${event.currentParticipants}/${event.maxParticipants} participants</span>
+                                </div>
+                            </div>
+                            <div class="btn-group" role="group">
+                                <button class="btn btn-sm btn-outline-success" onclick="viewEventParticipants('${event._id}')">
+                                    <i class="fas fa-users me-1"></i>Participants
+                                </button>
+                                <button class="btn btn-sm btn-outline-primary" onclick="editEvent('${event._id}')">
+                                    <i class="fas fa-edit me-1"></i>Edit
+                                </button>
+                                <button class="btn btn-sm btn-outline-danger" onclick="deleteEvent('${event._id}')">
+                                    <i class="fas fa-trash me-1"></i>Delete
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Create event
+        document.getElementById('create-event-form').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(this);
+            const eventData = {
+                title: formData.get('title'),
+                description: formData.get('description'),
+                date: formData.get('date'),
+                time: formData.get('time'),
+                venue: formData.get('venue'),
+                maxParticipants: parseInt(formData.get('maxParticipants')),
+                points: parseInt(formData.get('points'))
+            };
+
+            try {
+                const response = await apiCall('/api/events', {
+                    method: 'POST',
+                    body: JSON.stringify(eventData)
+                });
+                
+                if (response && response.ok) {
+                    alert('Event created successfully!');
+                    this.reset();
+                    showSection('events');
+                    loadMyEvents();
+                } else {
+                    const result = await response.json();
+                    alert(result.message || 'Event creation failed');
+                }
+            } catch (error) {
+                console.error('Error creating event:', error);
+                alert('Event creation failed. Please try again.');
+            }
+        });
+
+        // Load events for select dropdown
+        async function loadEventsForSelect() {
+            try {
+                const response = await apiCall('/api/admin/events');
+                if (response) {
+                    const events = await response.json();
+                    const select = document.getElementById('event-select');
+                    select.innerHTML = '<option value="">Choose an event...</option>' + 
+                        events.map(event => `<option value="${event._id}">${event.title}</option>`).join('');
+                }
+            } catch (error) {
+                console.error('Error loading events:', error);
+            }
+        }
+
+        // Load event participants
+        async function loadEventParticipants() {
+            const eventId = document.getElementById('event-select').value;
+            if (!eventId) return;
+
+            try {
+                const response = await apiCall(`/api/admin/events/${eventId}/participants`);
+                if (response) {
+                    const participants = await response.json();
+                    displayParticipants(participants);
+                }
+            } catch (error) {
+                console.error('Error loading participants:', error);
+            }
+        }
+
+        // Display participants
+        function displayParticipants(participants) {
+            const container = document.getElementById('participants-list');
+            
+            if (participants.length === 0) {
+                container.innerHTML = '<p class="text-muted text-center">No participants registered for this event</p>';
+                return;
+            }
+
+            container.innerHTML = `
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Student ID</th>
+                                <th>Department</th>
+                                <th>Year</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${participants.map(participant => `
+                                <tr>
+                                    <td>${participant.userId.name}</td>
+                                    <td>${participant.userId.studentId}</td>
+                                    <td>${participant.userId.department}</td>
+                                    <td>${participant.userId.year}</td>
+                                    <td>
+                                        <span class="badge bg-${participant.status === 'completed' ? 'success' : participant.status === 'attended' ? 'warning' : 'primary'}">
+                                            ${participant.status}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <select class="form-select form-select-sm" onchange="updateParticipantStatus('${participant.userId._id}', this.value)">
+                                            <option value="registered" ${participant.status === 'registered' ? 'selected' : ''}>Registered</option>
+                                            <option value="attended" ${participant.status === 'attended' ? 'selected' : ''}>Attended</option>
+                                            <option value="completed" ${participant.status === 'completed' ? 'selected' : ''}>Completed</option>
+                                        </select>
+                                    </td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                </div>
+            `;
+        }
+
+        // Update participant status
+        async function updateParticipantStatus(userId, status) {
+            const eventId = document.getElementById('event-select').value;
+            
+            try {
+                const response = await apiCall(`/api/events/${eventId}/participants/${userId}/status`, {
+                    method: 'PUT',
+                    body: JSON.stringify({ status })
+                });
+                
+                if (response && response.ok) {
+                    alert('Participant status updated successfully!');
+                    loadEventParticipants();
+                } else {
+                    const result = await response.json();
+                    alert(result.message || 'Status update failed');
+                }
+            } catch (error) {
+                console.error('Error updating status:', error);
+                alert('Status update failed. Please try again.');
+            }
+        }
+
+        // Load students
+        async function loadStudents() {
+            try {
+                const response = await apiCall('/api/admin/students');
+                if (response) {
+                    const students = await response.json();
+                    displayStudents(students);
+                }
+            } catch (error) {
+                console.error('Error loading students:', error);
+            }
+        }
+
+        // Display students
+        function displayStudents(students) {
+            const container = document.getElementById('students-list');
+            
+            if (students.length === 0) {
+                container.innerHTML = '<p class="text-muted text-center">No students found</p>';
+                return;
+            }
+
+            container.innerHTML = `
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Student ID</th>
+                                <th>Email</th>
+                                <th>Department</th>
+                                <th>Year</th>
+                                <th>Points</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${students.map(student => `
+                                <tr>
+                                    <td>${student.name}</td>
+                                    <td>${student.studentId}</td>
+                                    <td>${student.email}</td>
+                                    <td>${student.department}</td>
+                                    <td>${student.year}</td>
+                                    <td>${student.points}</td>
+                                    <td>
+                                        <button class="btn btn-sm btn-outline-primary" onclick="viewStudentDetails('${student._id}')">
+                                            <i class="fas fa-eye me-1"></i>View Details
+                                        </button>
+                                    </td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                </div>
+            `;
+        }
+
+        // Load admins
+        async function loadAdmins() {
+            try {
+                const response = await apiCall('/api/admin/students'); // This should be a separate admin endpoint
+                if (response) {
+                    const admins = await response.json();
+                    displayAdmins(admins);
+                }
+            } catch (error) {
+                console.error('Error loading admins:', error);
+            }
+        }
+
+        // Display admins
+        function displayAdmins(admins) {
+            const container = document.getElementById('admins-list');
+            container.innerHTML = '<p class="text-muted text-center">Admin management features coming soon</p>';
+        }
+
+        // Create admin
+        async function createAdmin() {
+            const form = document.getElementById('create-admin-form');
+            const formData = new FormData(form);
+            
+            const adminData = {
+                name: formData.get('name'),
+                email: formData.get('email'),
+                password: formData.get('password')
+            };
+
+            try {
+                const response = await apiCall('/api/admin/create-admin', {
+                    method: 'POST',
+                    body: JSON.stringify(adminData)
+                });
+                
+                if (response && response.ok) {
+                    alert('Admin created successfully!');
+                    form.reset();
+                    bootstrap.Modal.getInstance(document.getElementById('createAdminModal')).hide();
+                    loadAdmins();
+                } else {
+                    const result = await response.json();
+                    alert(result.message || 'Admin creation failed');
+                }
+            } catch (error) {
+                console.error('Error creating admin:', error);
+                alert('Admin creation failed. Please try again.');
+            }
+        }
+
+        // Logout
+        function logout() {
+            localStorage.removeItem('token');
+            localStorage.removeItem('user');
+            window.location.href = 'login.html';
+        }
+    </script>
+</body>
+</html>

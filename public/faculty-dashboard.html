@@ -1,0 +1,1083 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Faculty Dashboard - Club Event System</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <style>
+        .sidebar {
+            background: linear-gradient(135deg, #ff6b6b 0%, #feca57 100%);
+            min-height: 100vh;
+            color: white;
+        }
+        .sidebar .nav-link {
+            color: rgba(255, 255, 255, 0.8);
+            padding: 12px 20px;
+            border-radius: 8px;
+            margin: 5px 0;
+            transition: all 0.3s ease;
+        }
+        .sidebar .nav-link:hover,
+        .sidebar .nav-link.active {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+        }
+        .main-content {
+            background: #f8f9fa;
+            min-height: 100vh;
+        }
+        .card {
+            border: none;
+            border-radius: 15px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+        }
+        .card:hover {
+            transform: translateY(-5px);
+        }
+        .stats-card {
+            background: linear-gradient(135deg, #ff6b6b 0%, #feca57 100%);
+            color: white;
+        }
+        .btn-custom {
+            background: linear-gradient(45deg, #ff6b6b, #feca57);
+            border: none;
+            border-radius: 8px;
+            color: white;
+            padding: 8px 20px;
+            transition: all 0.3s ease;
+        }
+        .btn-custom:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            color: white;
+        }
+        .table th {
+            background: linear-gradient(135deg, #ff6b6b 0%, #feca57 100%);
+            color: white;
+            border: none;
+        }
+        .badge-custom {
+            background: linear-gradient(45deg, #ff6b6b, #feca57);
+            color: white;
+        }
+        .progress {
+            height: 8px;
+            border-radius: 4px;
+        }
+        .progress-bar {
+            background: linear-gradient(45deg, #ff6b6b, #feca57);
+        }
+    </style>
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Sidebar -->
+            <div class="col-md-3 col-lg-2 sidebar p-0">
+                <div class="p-3">
+                    <h4 class="text-center mb-4">
+                        <i class="fas fa-chalkboard-teacher me-2"></i>
+                        Faculty Portal
+                    </h4>
+                    <nav class="nav flex-column">
+                        <a class="nav-link active" href="#dashboard" onclick="showSection('dashboard')">
+                            <i class="fas fa-tachometer-alt me-2"></i>Dashboard
+                        </a>
+                        <a class="nav-link" href="#events" onclick="showSection('events')">
+                            <i class="fas fa-calendar-alt me-2"></i>All Events
+                        </a>
+                        <a class="nav-link" href="#participants" onclick="showSection('participants')">
+                            <i class="fas fa-users me-2"></i>Event Participants
+                        </a>
+                        <a class="nav-link" href="#past-events" onclick="showSection('past-events')">
+                            <i class="fas fa-history me-2"></i>Past Events
+                        </a>
+                        <a class="nav-link" href="#student-progress" onclick="showSection('student-progress')">
+                            <i class="fas fa-chart-line me-2"></i>Student Progress
+                        </a>
+                        <a class="nav-link" href="#leaderboard" onclick="showSection('leaderboard')">
+                            <i class="fas fa-trophy me-2"></i>Leaderboard
+                        </a>
+                        <a class="nav-link" href="#manage-admins" onclick="showSection('manage-admins')">
+                            <i class="fas fa-user-cog me-2"></i>Manage Admins
+                        </a>
+                             <a class="nav-link" href="#profile" onclick="showSection('profile')">
+                            <i class="fas fa-user me-2"></i>Profile
+                        <hr class="my-3">
+                        </a>
+                        <a class="nav-link" href="#" onclick="logout()">
+                            <i class="fas fa-sign-out-alt me-2"></i>Logout
+                        </a>
+                    </nav>
+                </div>
+            </div>
+
+            <!-- Main Content -->
+            <div class="col-md-9 col-lg-10 main-content">
+                <div class="p-4">
+                    <!-- Header -->
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h2 id="page-title">Dashboard</h2>
+                        <div class="d-flex align-items-center">
+                            <span class="me-3">Welcome, <span id="user-name">Faculty</span></span>
+                            <div class="badge badge-custom fs-6">Faculty</div>
+                        </div>
+                    </div>
+
+                    <!-- Dashboard Section -->
+                    <div id="dashboard-section" class="content-section">
+                        <!-- Stats Cards -->
+                        <div class="row mb-4">
+                            <div class="col-md-3">
+                                <div class="card stats-card">
+                                    <div class="card-body text-center">
+                                        <i class="fas fa-calendar-alt fa-2x mb-2"></i>
+                                        <h5 id="total-events">0</h5>
+                                        <p class="mb-0">Total Events</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="card stats-card">
+                                    <div class="card-body text-center">
+                                        <i class="fas fa-user-graduate fa-2x mb-2"></i>
+                                        <h5 id="total-students">0</h5>
+                                        <p class="mb-0">Total Students</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="card stats-card">
+                                    <div class="card-body text-center">
+                                        <i class="fas fa-calendar-check fa-2x mb-2"></i>
+                                        <h5 id="upcoming-events">0</h5>
+                                        <p class="mb-0">Upcoming Events</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="card stats-card">
+                                    <div class="card-body text-center">
+                                        <i class="fas fa-user-shield fa-2x mb-2"></i>
+                                        <h5 id="total-admins">0</h5>
+                                        <p class="mb-0">Total Admins</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Recent Activity -->
+                        <div class="row">
+                            <div class="col-lg-8">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h5 class="mb-0"><i class="fas fa-calendar-alt me-2"></i>Recent Events</h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <div id="recent-events">
+                                            <div class="text-center">
+                                                <div class="spinner-border text-warning" role="status">
+                                                    <span class="visually-hidden">Loading...</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-4">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h5 class="mb-0"><i class="fas fa-chart-pie me-2"></i>Quick Stats</h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="mb-3">
+                                            <div class="d-flex justify-content-between">
+                                                <span>Completed Events</span>
+                                                <span id="completed-events">0</span>
+                                            </div>
+                                            <div class="progress mt-1">
+                                                <div class="progress-bar" role="progressbar" style="width: 0%" id="completed-progress"></div>
+                                            </div>
+                                        </div>
+                                        <div class="mb-3">
+                                            <div class="d-flex justify-content-between">
+                                                <span>Active Students</span>
+                                                <span id="active-students">0</span>
+                                            </div>
+                                            <div class="progress mt-1">
+                                                <div class="progress-bar bg-success" role="progressbar" style="width: 0%" id="active-progress"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Events Section -->
+                    <div id="events-section" class="content-section" style="display: none;">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="mb-0"><i class="fas fa-calendar-alt me-2"></i>All Events</h5>
+                            </div>
+                            <div class="card-body">
+                                <div id="all-events">
+                                    <div class="text-center">
+                                        <div class="spinner-border text-warning" role="status">
+                                            <span class="visually-hidden">Loading...</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Participants Section -->
+                    <div id="participants-section" class="content-section" style="display: none;">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="mb-0"><i class="fas fa-users me-2"></i>Event Participants</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="mb-3">
+                                    <label for="event-select" class="form-label">Select Event</label>
+                                    <select class="form-control" id="event-select" onchange="loadEventParticipants()">
+                                        <option value="">Choose an event...</option>
+                                    </select>
+                                </div>
+                                <div id="participants-list">
+                                    <div class="text-center text-muted">
+                                        <i class="fas fa-info-circle me-2"></i>Select an event to view participants
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Past Events Section -->
+                    <div id="past-events-section" class="content-section" style="display: none;">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="mb-0"><i class="fas fa-history me-2"></i>Past Events & Winners</h5>
+                            </div>
+                            <div class="card-body">
+                                <div id="past-events">
+                                    <div class="text-center">
+                                        <div class="spinner-border text-warning" role="status">
+                                            <span class="visually-hidden">Loading...</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Student Progress Section -->
+                    <div id="student-progress-section" class="content-section" style="display: none;">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="mb-0"><i class="fas fa-chart-line me-2"></i>Student Progress & Participation</h5>
+                            </div>
+                            <div class="card-body">
+                                <div id="student-progress">
+                                    <div class="text-center">
+                                        <div class="spinner-border text-warning" role="status">
+                                            <span class="visually-hidden">Loading...</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Leaderboard Section -->
+                    <div id="leaderboard-section" class="content-section" style="display: none;">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="mb-0"><i class="fas fa-trophy me-2"></i>Student Leaderboard</h5>
+                            </div>
+                            <div class="card-body">
+                                <div id="leaderboard">
+                                    <div class="text-center">
+                                        <div class="spinner-border text-warning" role="status">
+                                            <span class="visually-hidden">Loading...</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Manage Admins Section -->
+                    <div id="manage-admins-section" class="content-section" style="display: none;">
+                        <div class="card">
+                            <div class="card-header d-flex justify-content-between align-items-center">
+                                <h5 class="mb-0"><i class="fas fa-user-cog me-2"></i>Manage Admin Accounts</h5>
+                                <button class="btn btn-custom" data-bs-toggle="modal" data-bs-target="#promoteStudentModal">
+                                    <i class="fas fa-user-plus me-2"></i>Promote Student to Admin
+                                </button>
+                            </div>
+                            <div class="card-body">
+                                <div id="admins-list">
+                                    <div class="text-center">
+                                        <div class="spinner-border text-warning" role="status">
+                                            <span class="visually-hidden">Loading...</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <!-- Profile Section -->
+                    <div id="profile-section" class="content-section" style="display: none;">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="mb-0"><i class="fas fa-user me-2"></i>My Profile</h5>
+                            </div>
+                            <div class="card-body">
+                                <form id="profile-form">
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="mb-3">
+                                                <label for="profile-name" class="form-label">Faculty Name</label>
+                                                <input type="text" class="form-control" id="profile-name" name="name">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="mb-3">
+                                                <label for="profile-email" class="form-label">Email</label>
+                                                <input type="email" class="form-control" id="profile-email" name="email" readonly>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="mb-3">
+                                                <label for="profile-phone" class="form-label">Phone</label>
+                                                <input type="tel" class="form-control" id="profile-phone" name="phone">
+                                            </div>
+                                        </div>
+                                         <div class="col-md-6">
+                                            <div class="mb-3">
+                                                <label for="profile-club" class="form-label">Club name</label>
+                                                <input type="text" class="form-control" id="profile-club" name="club">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="mb-3">
+                                                <label for="profile-department" class="form-label">Department</label>
+                                                <input type="text" class="form-control" id="profile-department" name="department">
+                                            </div>
+                                        </div>
+                                       
+                                        <div class="col-md-6">
+                                            <div class="mb-3">
+                                                <label for="profile-faculty-id" class="form-label">Faculty ID</label>
+                                                <input type="text" class="form-control" id="profile-faculty-id" name="facultyId" readonly>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <button type="submit" class="btn btn-custom">
+                                        <i class="fas fa-save me-2"></i>Update Profile
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Promote Student Modal -->
+    <div class="modal fade" id="promoteStudentModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Promote Student to Admin</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="promote-student-form">
+                        <div class="mb-3">
+                            <label for="student-select" class="form-label">Select Student</label>
+                            <select class="form-control" id="student-select" required>
+                                <option value="">Choose a student...</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="club-name" class="form-label">Club Name</label>
+                            <input type="text" class="form-control" id="club-name" name="clubName" required>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-custom" onclick="promoteStudent()">Promote to Admin</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        let currentUser = null;
+        let authToken = null;
+
+        // Check authentication
+        window.addEventListener('load', function() {
+            authToken = localStorage.getItem('token');
+            currentUser = JSON.parse(localStorage.getItem('user'));
+            
+            if (!authToken || !currentUser || currentUser.role !== 'faculty') {
+                window.location.href = 'login.html';
+                return;
+            }
+
+            // Update UI with user info
+            document.getElementById('user-name').textContent = currentUser.name;
+            
+            // Load dashboard data
+            loadDashboard();
+        });
+
+        // Navigation
+        function showSection(section) {
+            // Hide all sections
+            document.querySelectorAll('.content-section').forEach(s => s.style.display = 'none');
+            document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+            
+            // Show selected section
+            document.getElementById(`${section}-section`).style.display = 'block';
+            event.target.classList.add('active');
+            
+            // Update page title
+            const titles = {
+                'dashboard': 'Dashboard',
+                'events': 'All Events',
+                'participants': 'Event Participants',
+                'past-events': 'Past Events',
+                'student-progress': 'Student Progress',
+                'leaderboard': 'Leaderboard',
+                'manage-admins': 'Manage Admins',
+                'profile': 'Profile',
+            };
+            document.getElementById('page-title').textContent = titles[section];
+            
+            // Load section data
+            switch(section) {
+                case 'events':
+                    loadAllEvents();
+                    break;
+                case 'participants':
+                    loadEventsForSelect();
+                    break;
+                case 'past-events':
+                    loadPastEvents();
+                    break;
+                case 'student-progress':
+                    loadStudentProgress();
+                    break;
+                case 'leaderboard':
+                    loadLeaderboard();
+                    break;
+                case 'manage-admins':
+                    loadAdmins();
+                    loadStudentsForPromotion();
+                    break;
+                case 'profile':
+                    loadProfile();
+                    break;
+            }
+        }
+
+        // API calls
+        async function apiCall(url, options = {}) {
+            const defaultOptions = {
+                headers: {
+                    'Authorization': `Bearer ${authToken}`,
+                    'Content-Type': 'application/json'
+                }
+            };
+            
+            const response = await fetch(url, { ...defaultOptions, ...options });
+            
+            if (response.status === 401) {
+                localStorage.removeItem('token');
+                localStorage.removeItem('user');
+                window.location.href = 'login.html';
+                return null;
+            }
+            
+            return response;
+        }
+
+        // Load dashboard data
+        async function loadDashboard() {
+            try {
+                const [statsRes, eventsRes] = await Promise.all([
+                    apiCall('/api/faculty/dashboard-stats'),
+                    apiCall('/api/faculty/events')
+                ]);
+
+                if (statsRes) {
+                    const stats = await statsRes.json();
+                    document.getElementById('total-events').textContent = stats.totalEvents;
+                    document.getElementById('total-students').textContent = stats.totalStudents;
+                    document.getElementById('upcoming-events').textContent = stats.upcomingEvents;
+                    document.getElementById('total-admins').textContent = stats.totalAdmins;
+                    document.getElementById('completed-events').textContent = stats.completedEvents;
+                    
+                    // Update progress bars
+                    const completedPercentage = (stats.completedEvents / Math.max(stats.totalEvents, 1)) * 100;
+                    document.getElementById('completed-progress').style.width = `${completedPercentage}%`;
+                    
+                    const activePercentage = (stats.totalStudents / 100) * 100; // Assuming 100 as max
+                    document.getElementById('active-progress').style.width = `${Math.min(activePercentage, 100)}%`;
+                    document.getElementById('active-students').textContent = stats.totalStudents;
+                }
+
+                if (eventsRes) {
+                    const events = await eventsRes.json();
+                    displayRecentEvents(events.slice(0, 5));
+                }
+            } catch (error) {
+                console.error('Error loading dashboard:', error);
+            }
+        }
+
+        // Display recent events
+        function displayRecentEvents(events) {
+            const container = document.getElementById('recent-events');
+            
+            if (events.length === 0) {
+                container.innerHTML = '<p class="text-muted text-center">No events available</p>';
+                return;
+            }
+
+            container.innerHTML = events.map(event => `
+                <div class="card mb-3">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <h6 class="card-title">${event.title}</h6>
+                                <p class="card-text text-muted">${event.description}</p>
+                                <small class="text-muted">
+                                    <i class="fas fa-calendar me-1"></i>${new Date(event.date).toLocaleDateString()}
+                                    <i class="fas fa-clock me-1 ms-2"></i>${event.time}
+                                    <i class="fas fa-map-marker-alt me-1 ms-2"></i>${event.venue}
+                                </small>
+                                <div class="mt-2">
+                                    <span class="badge bg-${event.status === 'completed' ? 'success' : event.status === 'ongoing' ? 'warning' : 'primary'}">${event.status}</span>
+                                    <span class="badge bg-secondary ms-2">${event.currentParticipants}/${event.maxParticipants} participants</span>
+                                </div>
+                            </div>
+                            <div>
+                                <button class="btn btn-sm btn-outline-warning" onclick="viewEventDetails('${event._id}')">
+                                    <i class="fas fa-eye me-1"></i>View Details
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Load all events
+        async function loadAllEvents() {
+            try {
+                const response = await apiCall('/api/faculty/events');
+                if (response) {
+                    const events = await response.json();
+                    displayAllEvents(events);
+                }
+            } catch (error) {
+                console.error('Error loading events:', error);
+            }
+        }
+
+        // Display all events
+        function displayAllEvents(events) {
+            const container = document.getElementById('all-events');
+            
+            if (events.length === 0) {
+                container.innerHTML = '<p class="text-muted text-center">No events available</p>';
+                return;
+            }
+
+            container.innerHTML = events.map(event => `
+                <div class="card mb-3">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <h6 class="card-title">${event.title}</h6>
+                                <p class="card-text text-muted">${event.description}</p>
+                                <small class="text-muted">
+                                    <i class="fas fa-calendar me-1"></i>${new Date(event.date).toLocaleDateString()}
+                                    <i class="fas fa-clock me-1 ms-2"></i>${event.time}
+                                    <i class="fas fa-map-marker-alt me-1 ms-2"></i>${event.venue}
+                                </small>
+                                <div class="mt-2">
+                                    <span class="badge bg-${event.status === 'completed' ? 'success' : event.status === 'ongoing' ? 'warning' : 'primary'}">${event.status}</span>
+                                    <span class="badge bg-secondary ms-2">${event.currentParticipants}/${event.maxParticipants} participants</span>
+                                    <span class="badge bg-info ms-2">Created by: ${event.createdBy.name}</span>
+                                </div>
+                            </div>
+                            <div>
+                                <button class="btn btn-sm btn-outline-warning" onclick="viewEventParticipants('${event._id}')">
+                                    <i class="fas fa-users me-1"></i>View Participants
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Load events for select dropdown
+        async function loadEventsForSelect() {
+            try {
+                const response = await apiCall('/api/faculty/events');
+                if (response) {
+                    const events = await response.json();
+                    const select = document.getElementById('event-select');
+                    select.innerHTML = '<option value="">Choose an event...</option>' + 
+                        events.map(event => `<option value="${event._id}">${event.title}</option>`).join('');
+                }
+            } catch (error) {
+                console.error('Error loading events:', error);
+            }
+        }
+
+        // Load event participants
+        async function loadEventParticipants() {
+            const eventId = document.getElementById('event-select').value;
+            if (!eventId) return;
+
+            try {
+                const response = await apiCall(`/api/faculty/events/${eventId}/participants`);
+                if (response) {
+                    const data = await response.json();
+                    displayEventParticipants(data);
+                }
+            } catch (error) {
+                console.error('Error loading participants:', error);
+            }
+        }
+
+        // Display event participants
+        function displayEventParticipants(data) {
+            const container = document.getElementById('participants-list');
+            
+            if (data.participants.length === 0) {
+                container.innerHTML = '<p class="text-muted text-center">No participants registered for this event</p>';
+                return;
+            }
+
+            container.innerHTML = `
+                <div class="mb-3">
+                    <h6>Event: ${data.event.title}</h6>
+                    <p class="text-muted">${data.event.description}</p>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Student ID</th>
+                                <th>Department</th>
+                                <th>Year</th>
+                                <th>Phone</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${data.participants.map(participant => `
+                                <tr>
+                                    <td>${participant.userId.name}</td>
+                                    <td>${participant.userId.studentId}</td>
+                                    <td>${participant.userId.department}</td>
+                                    <td>${participant.userId.year}</td>
+                                    <td>${participant.userId.phone}</td>
+                                    <td>
+                                        <span class="badge bg-${participant.status === 'completed' ? 'success' : participant.status === 'attended' ? 'warning' : 'primary'}">
+                                            ${participant.status}
+                                        </span>
+                                    </td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                </div>
+            `;
+        }
+
+        // Load past events
+        async function loadPastEvents() {
+            try {
+                const response = await apiCall('/api/faculty/past-events');
+                if (response) {
+                    const events = await response.json();
+                    displayPastEvents(events);
+                }
+            } catch (error) {
+                console.error('Error loading past events:', error);
+            }
+        }
+
+        // Display past events
+        function displayPastEvents(events) {
+            const container = document.getElementById('past-events');
+            
+            if (events.length === 0) {
+                container.innerHTML = '<p class="text-muted text-center">No past events available</p>';
+                return;
+            }
+
+            container.innerHTML = events.map(event => `
+                <div class="card mb-3">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <h6 class="card-title">${event.title}</h6>
+                                <p class="card-text text-muted">${event.description}</p>
+                                <small class="text-muted">
+                                    <i class="fas fa-calendar me-1"></i>${new Date(event.date).toLocaleDateString()}
+                                    <i class="fas fa-clock me-1 ms-2"></i>${event.time}
+                                    <i class="fas fa-map-marker-alt me-1 ms-2"></i>${event.venue}
+                                </small>
+                                <div class="mt-2">
+                                    <span class="badge bg-success">Completed</span>
+                                    <span class="badge bg-secondary ms-2">${event.currentParticipants} participants</span>
+                                    <span class="badge bg-info ms-2">Created by: ${event.createdBy.name}</span>
+                                </div>
+                                ${event.certificates.length > 0 ? `
+                                    <div class="mt-2">
+                                        <small class="text-success">
+                                            <i class="fas fa-certificate me-1"></i>${event.certificates.length} certificates issued
+                                        </small>
+                                    </div>
+                                ` : ''}
+                            </div>
+                            <div>
+                                <button class="btn btn-sm btn-outline-warning" onclick="viewEventWinners('${event._id}')">
+                                    <i class="fas fa-trophy me-1"></i>View Winners
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Load student progress
+        async function loadStudentProgress() {
+            try {
+                const response = await apiCall('/api/faculty/students-progress');
+                if (response) {
+                    const students = await response.json();
+                    displayStudentProgress(students);
+                }
+            } catch (error) {
+                console.error('Error loading student progress:', error);
+            }
+        }
+
+        // Display student progress
+        function displayStudentProgress(students) {
+            const container = document.getElementById('student-progress');
+            
+            if (students.length === 0) {
+                container.innerHTML = '<p class="text-muted text-center">No student data available</p>';
+                return;
+            }
+
+            container.innerHTML = `
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Student ID</th>
+                                <th>Department</th>
+                                <th>Year</th>
+                                <th>Points</th>
+                                <th>Events</th>
+                                <th>Completed</th>
+                                <th>Certificates</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${students.map(student => `
+                                <tr>
+                                    <td>${student.name}</td>
+                                    <td>${student.studentId}</td>
+                                    <td>${student.department}</td>
+                                    <td>${student.year}</td>
+                                    <td>
+                                        <span class="badge bg-warning">${student.points}</span>
+                                    </td>
+                                    <td>${student.totalEvents}</td>
+                                    <td>${student.completedEvents}</td>
+                                    <td>${student.certificatesEarned}</td>
+                                    <td>
+                                        <button class="btn btn-sm btn-outline-warning" onclick="viewStudentDetails('${student.id}')">
+                                            <i class="fas fa-eye me-1"></i>View Details
+                                        </button>
+                                    </td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                </div>
+            `;
+        }
+
+        // Load leaderboard
+        async function loadLeaderboard() {
+            try {
+                const response = await apiCall('/api/faculty/leaderboard');
+                if (response) {
+                    const leaderboard = await response.json();
+                    displayLeaderboard(leaderboard);
+                }
+            } catch (error) {
+                console.error('Error loading leaderboard:', error);
+            }
+        }
+
+        // Display leaderboard
+        function displayLeaderboard(leaderboard) {
+            const container = document.getElementById('leaderboard');
+            
+            if (leaderboard.length === 0) {
+                container.innerHTML = '<p class="text-muted text-center">No leaderboard data available</p>';
+                return;
+            }
+
+            container.innerHTML = `
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Rank</th>
+                                <th>Name</th>
+                                <th>Student ID</th>
+                                <th>Department</th>
+                                <th>Year</th>
+                                <th>Points</th>
+                                <th>Events</th>
+                                <th>Certificates</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${leaderboard.map((student, index) => `
+                                <tr class="${index < 3 ? 'table-warning' : ''}">
+                                    <td>
+                                        <span class="badge bg-${index < 3 ? ['warning', 'secondary', 'info'][index] : 'secondary'}">
+                                            ${student.rank || index + 1}
+                                        </span>
+                                    </td>
+                                    <td>${student.name}</td>
+                                    <td>${student.studentId}</td>
+                                    <td>${student.department}</td>
+                                    <td>${student.year}</td>
+                                    <td>${student.totalPoints}</td>
+                                    <td>${student.eventsAttended}</td>
+                                    <td>${student.certificatesEarned}</td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                </div>
+            `;
+        }
+
+        // Load admins
+        async function loadAdmins() {
+            try {
+                const response = await apiCall('/api/faculty/admins');
+                if (response) {
+                    const admins = await response.json();
+                    displayAdmins(admins);
+                }
+            } catch (error) {
+                console.error('Error loading admins:', error);
+            }
+        }
+
+        // Load students for promotion
+        async function loadStudentsForPromotion() {
+            try {
+                const response = await apiCall('/api/faculty/students-progress');
+                if (response) {
+                    const students = await response.json();
+                    const select = document.getElementById('student-select');
+                    select.innerHTML = '<option value="">Choose a student...</option>' + 
+                        students.map(student => `<option value="${student.id}">${student.name} (${student.studentId})</option>`).join('');
+                }
+            } catch (error) {
+                console.error('Error loading students:', error);
+            }
+        }
+
+        // Promote student to admin
+        async function promoteStudent() {
+            const studentId = document.getElementById('student-select').value;
+            const clubName = document.getElementById('club-name').value;
+
+            if (!studentId || !clubName) {
+                alert('Please select a student and enter a club name');
+                return;
+            }
+
+            try {
+                const response = await apiCall('/api/faculty/promote', {
+                    method: 'POST',
+                    body: JSON.stringify({ studentId, clubName })
+                });
+                
+                if (response && response.ok) {
+                    alert('Student promoted to admin successfully!');
+                    document.getElementById('promote-student-form').reset();
+                    bootstrap.Modal.getInstance(document.getElementById('promoteStudentModal')).hide();
+                    loadAdmins();
+                } else {
+                    const result = await response.json();
+                    alert(result.message || 'Promotion failed');
+                }
+            } catch (error) {
+                console.error('Error promoting student:', error);
+                alert('Promotion failed. Please try again.');
+            }
+        }
+
+        // Display admins
+        function displayAdmins(admins) {
+            const container = document.getElementById('admins-list');
+            
+            if (admins.length === 0) {
+                container.innerHTML = '<p class="text-muted text-center">No admins found</p>';
+                return;
+            }
+
+            container.innerHTML = `
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Email</th>
+                                <th>Student ID</th>
+                                <th>Created</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${admins.map(admin => `
+                                <tr>
+                                    <td>${admin.name}</td>
+                                    <td>${admin.email}</td>
+                                    <td>${admin.studentId}</td>
+                                    <td>${new Date(admin.createdAt).toLocaleDateString()}</td>
+                                    <td>
+                                        <button class="btn btn-sm btn-outline-danger" onclick="removeAdmin('${admin._id}')">
+                                            <i class="fas fa-trash me-1"></i>Remove
+                                        </button>
+                                    </td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                </div>
+            `;
+        }
+
+        // Remove admin
+        async function removeAdmin(adminId) {
+            if (!confirm('Are you sure you want to remove this admin?')) return;
+
+            try {
+                const response = await apiCall(`/api/faculty/admins/${adminId}`, {
+                    method: 'DELETE'
+                });
+                
+                if (response && response.ok) {
+                    alert('Admin removed successfully!');
+                    loadAdmins();
+                } else {
+                    const result = await response.json();
+                    alert(result.message || 'Failed to remove admin');
+                }
+            } catch (error) {
+                console.error('Error removing admin:', error);
+                alert('Failed to remove admin. Please try again.');
+            }
+        }
+        
+          // Load profile
+        async function loadProfile() {
+            try {
+                const response = await apiCall('/api/users/profile');
+                if (response) {
+                    const profile = await response.json();
+                    document.getElementById('profile-name').value = profile.name;
+                    document.getElementById('profile-email').value = profile.email;
+                    document.getElementById('profile-phone').value = profile.phone;
+                    document.getElementById('profile-club').value = profile.club;
+                    document.getElementById('profile-department').value = profile.department;
+                   
+                    document.getElementById('profile-faculty-id').value = profile.facultyId;
+                }
+            } catch (error) {
+                console.error('Error loading profile:', error);
+            }
+        }
+
+        // Update profile
+        document.getElementById('profile-form').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(this);
+            const updateData = {
+                name: formData.get('name'),
+                phone: formData.get('phone'),
+                department: formData.get('department'),
+                year: formData.get('year')
+            };
+
+            try {
+                const response = await apiCall('/api/users/profile', {
+                    method: 'PUT',
+                    body: JSON.stringify(updateData)
+                });
+                
+                if (response && response.ok) {
+                    alert('Profile updated successfully!');
+                    // Update current user data
+                    const updatedUser = await response.json();
+                    localStorage.setItem('user', JSON.stringify(updatedUser));
+                    currentUser = updatedUser;
+                    document.getElementById('user-name').textContent = currentUser.name;
+                } else {
+                    const result = await response.json();
+                    alert(result.message || 'Update failed');
+                }
+            } catch (error) {
+                console.error('Error updating profile:', error);
+                alert('Update failed. Please try again.');
+            }
+        });
+        // Logout
+        function logout() {
+            localStorage.removeItem('token');
+            localStorage.removeItem('user');
+            window.location.href = 'login.html';
+        }
+    </script>
+</body>
+</html>

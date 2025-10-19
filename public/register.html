@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register - Club Event System</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            padding: 20px 0;
+        }
+        .register-card {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+        .register-header {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            padding: 2rem;
+            text-align: center;
+        }
+        .form-control {
+            border-radius: 10px;
+            border: 2px solid #e9ecef;
+            padding: 12px 15px;
+            transition: all 0.3s ease;
+        }
+        .form-control:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+        }
+        .btn-register {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            border: none;
+            border-radius: 10px;
+            padding: 12px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        .btn-register:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+        .form-section {
+            display: none;
+        }
+        .form-section.active {
+            display: block;
+        }
+        .step-indicator {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 30px;
+        }
+        .step {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #e9ecef;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 10px;
+            font-weight: bold;
+            color: #6c757d;
+        }
+        .step.active {
+            background: #667eea;
+            color: white;
+        }
+        .step.completed {
+            background: #28a745;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-8 col-lg-6">
+                <div class="register-card">
+                    <div class="register-header">
+                        <i class="fas fa-user-plus fa-3x mb-3"></i>
+                        <h3 class="mb-0">Create Account</h3>
+                        <p class="mb-0">Join the Club Event System</p>
+                    </div>
+                    <div class="p-4">
+                        <!-- Step Indicator -->
+                        <div class="step-indicator">
+                            <div class="step active" id="step1">1</div>
+                            <div class="step" id="step2">2</div>
+                            <div class="step" id="step3">3</div>
+                        </div>
+
+                        <form id="registerForm">
+                            <!-- Step 1: Role Selection -->
+                            <div class="form-section active" id="section1">
+                                <h5 class="mb-3">Select Your Role</h5>
+                                <div class="row g-3">
+                                    <div class="col-md-4">
+                                        <div class="card role-card h-100" data-role="student">
+                                            <div class="card-body text-center">
+                                                 <i class="fas fa-user-graduate fa-3x text-primary mb-3"></i>
+                                                <h6>Student</h6>
+                                                
+                                            </div>
+                                        </div>
+                                    </div>
+                                
+                                   
+                                </div>
+                                <div class="d-grid mt-3">
+                                    <button type="button" class="btn btn-primary" onclick="nextStep()">Next</button>
+                                </div>
+                            </div>
+
+                            <!-- Step 2: Basic Information -->
+                            <div class="form-section" id="section2">
+                                <h5 class="mb-3">Basic Information</h5>
+                                <div class="row g-3">
+                                    <div class="col-md-6">
+                                        <label for="name" class="form-label">Full Name</label>
+                                        <input type="text" class="form-control" id="name" name="name" required>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="email" class="form-label">Email Address</label>
+                                        <input type="email" class="form-control" id="email" name="email" required>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="password" class="form-label">Password</label>
+                                        <input type="password" class="form-control" id="password" name="password" required>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="phone" class="form-label">Phone Number</label>
+                                        <input type="tel" class="form-control" id="phone" name="phone" required>
+                                    </div>
+                                </div>
+                                <div class="d-flex justify-content-between mt-3">
+                                    <button type="button" class="btn btn-outline-secondary" onclick="prevStep()">Previous</button>
+                                    <button type="button" class="btn btn-primary" onclick="nextStep()">Next</button>
+                                </div>
+                            </div>
+
+                            <!-- Step 3: Additional Information -->
+                            <div class="form-section" id="section3">
+                                <h5 class="mb-3">Additional Information</h5>
+                                <div class="row g-3">
+                                    <div class="col-md-6">
+                                        <label for="studentId" class="form-label">Student ID</label>
+                                        <input type="text" class="form-control" id="studentId" name="studentId" required>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="department" class="form-label">Department</label>
+                                        <select class="form-control" id="department" name="department" required>
+                                            <option value="">Select Department</option>
+                                            <option value="Mechatronics">Mechatronics</option>
+                                            <option value="Computer Science">Computer Science</option>
+                                            <option value="Information Technology">Information Technology</option>
+                                            <option value="Electronics">Electronics</option>
+                                            <option value="Mechanical">Mechanical</option>
+                                            <option value="Civil">Civil</option>
+                                            <option value="Electrical">Electrical</option>
+                                            <option value="Other">Other</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="year" class="form-label">Year</label>
+                                        <select class="form-control" id="year" name="year" required>
+                                            <option value="">Select Year</option>
+                                            <option value="1st Year">1st Year</option>
+                                            <option value="2nd Year">2nd Year</option>
+                                            <option value="3rd Year">3rd Year</option>
+                                            <option value="4th Year">4th Year</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="confirmPassword" class="form-label">Confirm Password</label>
+                                        <input type="password" class="form-control" id="confirmPassword" name="confirmPassword" required>
+                                    </div>
+                                </div>
+                                <div class="d-flex justify-content-between mt-3">
+                                    <button type="button" class="btn btn-outline-secondary" onclick="prevStep()">Previous</button>
+                                    <button type="submit" class="btn btn-primary btn-register">
+                                        <i class="fas fa-user-plus me-2"></i>Create Account
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+
+                        <div class="text-center mt-3">
+                            <p class="mb-0">Already have an account? <a href="login.html" class="text-decoration-none">Login here</a></p>
+                        </div>
+                        <div class="text-center mt-2">
+                            <a href="index.html" class="text-decoration-none">
+                                <i class="fas fa-arrow-left me-2"></i>Back to Home
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        let currentStep = 1;
+        let selectedRole = 'student';
+
+        // Role selection
+        document.querySelectorAll('.role-card').forEach(card => {
+            card.addEventListener('click', function() {
+                document.querySelectorAll('.role-card').forEach(c => c.classList.remove('border-primary'));
+                this.classList.add('border-primary');
+                selectedRole = this.dataset.role;
+            });
+        });
+
+        function nextStep() {
+            if (currentStep < 3) {
+                document.getElementById(`section${currentStep}`).classList.remove('active');
+                document.getElementById(`step${currentStep}`).classList.remove('active');
+                document.getElementById(`step${currentStep}`).classList.add('completed');
+                
+                currentStep++;
+                
+                document.getElementById(`section${currentStep}`).classList.add('active');
+                document.getElementById(`step${currentStep}`).classList.add('active');
+            }
+        }
+
+        function prevStep() {
+            if (currentStep > 1) {
+                document.getElementById(`section${currentStep}`).classList.remove('active');
+                document.getElementById(`step${currentStep}`).classList.remove('active');
+                
+                currentStep--;
+                
+                document.getElementById(`section${currentStep}`).classList.add('active');
+                document.getElementById(`step${currentStep}`).classList.add('active');
+                document.getElementById(`step${currentStep + 1}`).classList.remove('completed');
+            }
+        }
+
+        // Form submission
+        document.getElementById('registerForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(this);
+            const password = formData.get('password');
+            const confirmPassword = formData.get('confirmPassword');
+            
+            // Validate required fields
+            const requiredFields = ['name', 'email', 'password', 'studentId', 'department', 'year', 'phone', 'confirmPassword'];
+            for (const field of requiredFields) {
+                if (!formData.get(field)) {
+                    alert(`Please fill in the ${field} field`);
+                    return;
+                }
+            }
+            
+            if (password !== confirmPassword) {
+                alert('Passwords do not match');
+                return;
+            }
+
+            const registerData = {
+                name: formData.get('name'),
+                email: formData.get('email'),
+                password: password,
+                studentId: formData.get('studentId'),
+                department: formData.get('department'),
+                year: formData.get('year'),
+                phone: formData.get('phone'),
+                role: selectedRole
+            };
+
+            try {
+                console.log('Sending registration data:', registerData);
+                const response = await fetch('/api/auth/register', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(registerData)
+                });
+                console.log('Response status:', response.status);
+
+                const result = await response.json();
+
+                if (response.ok) {
+                    alert('Registration successful! Please login to continue.');
+                    window.location.href = 'login.html';
+                } else {
+                    // Show more detailed error message
+                    let errorMessage = 'Registration failed';
+                    if (result.errors && result.errors.length > 0) {
+                        errorMessage = result.errors.map(err => err.msg).join(', ');
+                    } else if (result.message) {
+                        errorMessage = result.message;
+                    }
+                    alert(errorMessage);
+                }
+            } catch (error) {
+                console.error('Registration error:', error);
+                alert('Registration failed. Please try again.');
+            }
+        });
+    </script>
+</body>
+</html>
