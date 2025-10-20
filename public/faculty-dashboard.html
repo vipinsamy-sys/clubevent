@@ -664,28 +664,33 @@
         // Load event participants
         async function loadEventParticipants() {
             const eventId = document.getElementById('event-select').value;
-            if (!eventId) return;
-
+            const container = document.getElementById('participants-list');
+            if (!eventId) {
+                container.innerHTML = '<div class="text-center text-muted"><i class="fas fa-info-circle me-2"></i>Select an event to view participants</div>';
+                return;
+            }
+            container.innerHTML = '<div class="text-center"><div class="spinner-border text-warning"></div></div>';
             try {
                 const response = await apiCall(`/api/faculty/events/${eventId}/participants`);
-                if (response) {
-                    const data = await response.json();
-                    displayEventParticipants(data);
+                if (!response || !response.ok) throw new Error('Failed to fetch participants');
+                const data = await response.json();
+                if (!data.participants || data.participants.length === 0) {
+                    container.innerHTML = '<p class="text-muted text-center">No participants registered for this event</p>';
+                    return;
                 }
+                displayEventParticipants(data);
             } catch (error) {
-                console.error('Error loading participants:', error);
+                container.innerHTML = `<p class="text-danger text-center">Error loading participants: ${error.message}</p>`;
             }
         }
 
         // Display event participants
         function displayEventParticipants(data) {
             const container = document.getElementById('participants-list');
-            
-            if (data.participants.length === 0) {
+            if (!data.participants || data.participants.length === 0) {
                 container.innerHTML = '<p class="text-muted text-center">No participants registered for this event</p>';
                 return;
             }
-
             container.innerHTML = `
                 <div class="mb-3">
                     <h6>Event: ${data.event.title}</h6>
@@ -723,6 +728,7 @@
                 </div>
             `;
         }
+
 
         // Load past events
         async function loadPastEvents() {
