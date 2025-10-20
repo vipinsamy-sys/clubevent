@@ -8,10 +8,29 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <style>
         .main-section {
-            background: linear-gradient(135deg, black 0%, #41136d 100%);
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
             padding: 100px 0;
+        }
+        .feature-card {
+            transition: transform 0.3s ease;
+            border: none;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .feature-card:hover {
+            transform: translateY(-5px);
+        }
+        .role-card {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
             text-align: center;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+        .role-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
         }
         .btn-custom {
             background: linear-gradient(45deg, #667eea, #764ba2);
@@ -27,35 +46,16 @@
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
             color: white;
         }
-
-        /* Popup custom styling */
-        .custom-modal {
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            color: white;
-            border-radius: 15px;
-            box-shadow: 0 8px 25px rgba(0,0,0,0.3);
-        }
-        .custom-modal .btn-primary {
-            background-color: #ff6b6b; /* Register button */
-            border: none;
-        }
-        .custom-modal .btn-primary:hover {
-            background-color: #ff4b4b;
-        }
-        .custom-modal .btn-secondary {
-            background-color: #4caf50; /* Login button */
-            border: none;
-        }
-        .custom-modal .btn-secondary:hover {
-            background-color: #3e8e41;
-        }
     </style>
 </head>
 <body>
     <!-- Navigation -->
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
         <div class="container">
-            <a class="navbar-brand" href="#"><i class="fas fa-calendar-alt me-2"></i>Club Event Booking System</a>
+            <a class="navbar-brand" href="#">
+                <i class="fas fa-calendar-alt me-2"></i>
+                Club Event Booking System
+            </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
             </button>
@@ -79,42 +79,49 @@
         </div>
     </nav>
 
-    <!-- Main Section -->
+    <!-- main Section -->
     <section class="main-section">
         <div class="container">
-            <h1 class="display-4 fw-bold mb-4">Club Event Booking System</h1>
-            <!-- Get Started Button triggers modal -->
-            <button type="button" class="btn btn-custom btn-lg" data-bs-toggle="modal" data-bs-target="#getStartedModal">
-                Get Started
-            </button>
+            <div class="row align-items-center">
+                <div class="col-lg-6">
+                    <h1 class="display-4 fw-bold mb-4">Club Event Booking System</h1>
+                    
+                        <!-- Button trigger modal -->
+<button type="button" class="btn btn-light btn-lg" data-bs-toggle="modal" data-bs-target="#getStartedModal">
+    Get Started
+</button>
+                     <!-- Get Started Modal -->
+<div class="modal fade" id="getStartedModal" tabindex="-1" aria-labelledby="getStartedModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="getStartedModalLabel">Welcome!</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body text-center">
+        <p>Are you a new user or already a member?</p>
+        <div class="d-flex justify-content-center gap-3 mt-3">
+          <a href="register.html" class="btn btn-primary">Register</a>
+          <button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#loginModal" data-bs-dismiss="modal">
+            Login
+          </button>
         </div>
-    </section>
+      </div>
+    </div>
+  </div>
+</div>
 
-    <!-- Get Started Modal -->
-    <div class="modal fade" id="getStartedModal" tabindex="-1" aria-labelledby="getStartedModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content custom-modal p-4">
-                <div class="modal-header border-0">
-                
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body text-center">
-                    <p class="mb-3">Select your role to login:</p>
-                    <div class="d-flex justify-content-center gap-3 mb-3">
-                        <a href="student-login.html" class="btn btn-secondary">Student</a>
-                        <a href="admin-login.html" class="btn btn-secondary">Admin</a>
-                        <a href="faculty-login.html" class="btn btn-secondary">Faculty</a>
+
                     </div>
-                    <hr class="border-light">
-                    <p class="mb-2">Or register if you are new:</p>
-                    <a href="register.html" class="btn btn-primary">Register</a>
                 </div>
+             
             </div>
         </div>
-    </div>
+    </section>
+            
 
     <!-- Footer -->
-    <footer class="bg-dark text-white py-5 mt-5">
+    <footer class="bg-dark text-white py-5">
         <div class="container">
             <div class="row">
                 <div class="col-lg-6">

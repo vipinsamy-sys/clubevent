@@ -117,52 +117,12 @@ router.get('/events', auth, async (req, res) => {
       return res.status(403).json({ message: 'Access denied' });
     }
 
-    // Get events with rich details needed by the frontend
     const events = await Event.find()
-      .populate({
-        path: 'createdBy',
-        select: 'name email facultyId position clubName department'
-      })
-      .populate({
-        path: 'participants.userId',
-        select: 'name studentId department year phone points certificates registeredEvents'
-      })
-      .populate({
-        path: 'club',
-        select: 'name description'
-      })
-      .populate({
-        path: 'certificates.userId',
-        select: 'name studentId department year'
-      })
-      .lean()
-      .sort({ date: -1 });
+      .populate('createdBy', 'name email')
+      .populate('participants.userId', 'name studentId department year')
+      .sort({ createdAt: -1 });
 
-    // Enrich events with computed fields for the frontend
-    const eventsWithDetails = events.map(event => ({
-      ...event,
-      currentParticipants: event.participants ? event.participants.length : 0,
-      maxParticipants: event.maxParticipants || 100,
-      completedParticipants: event.participants ? event.participants.filter(p => p.status === 'completed').length : 0,
-      certificatesIssued: event.certificates ? event.certificates.length : 0,
-      createdBy: {
-        ...event.createdBy,
-        clubName: event.createdBy.clubName || event.clubName || 'General Club'
-      },
-      participants: event.participants ? event.participants.map(p => ({
-        ...p,
-        userId: {
-          ...p.userId,
-          progress: p.userId ? {
-            totalEvents: p.userId.registeredEvents ? p.userId.registeredEvents.length : 0,
-            completedEvents: p.userId.registeredEvents ? p.userId.registeredEvents.filter(e => e.status === 'completed').length : 0,
-            certificatesEarned: p.userId.certificates ? p.userId.certificates.length : 0
-          } : null
-        }
-      })) : []
-    }));
-
-    res.json(eventsWithDetails);
+    res.json(events);
   } catch (error) {
     console.error('Get events error:', error);
     res.status(500).json({ message: 'Server error' });
@@ -206,61 +166,12 @@ router.get('/past-events', auth, async (req, res) => {
       return res.status(403).json({ message: 'Access denied' });
     }
 
-    // Get completed events with full participant and certificate details
     const pastEvents = await Event.find({ status: 'completed' })
-      .populate({
-        path: 'createdBy',
-        select: 'name email facultyId position clubName department'
-      })
-      .populate({
-        path: 'participants.userId',
-        select: 'name studentId department year phone points certificates registeredEvents'
-      })
-      .populate({
-        path: 'club',
-        select: 'name description'
-      })
-      .populate({
-        path: 'certificates.userId',
-        select: 'name studentId department year points'
-      })
-      .lean()
+      .populate('createdBy', 'name email')
+      .populate('certificates.userId', 'name studentId')
       .sort({ date: -1 });
 
-    // Enrich past events with detailed completion and certificate information
-    const pastEventsWithDetails = pastEvents.map(event => ({
-      ...event,
-      currentParticipants: event.participants ? event.participants.length : 0,
-      maxParticipants: event.maxParticipants || 100,
-      certificatesIssued: event.certificates ? event.certificates.length : 0,
-      completedParticipants: event.participants ? event.participants.filter(p => p.status === 'completed').length : 0,
-      createdBy: {
-        ...event.createdBy,
-        clubName: event.createdBy.clubName || event.clubName || 'General Club'
-      },
-      participants: event.participants ? event.participants.map(p => ({
-        ...p,
-        userId: {
-          ...p.userId,
-          progress: p.userId ? {
-            totalEvents: p.userId.registeredEvents ? p.userId.registeredEvents.length : 0,
-            completedEvents: p.userId.registeredEvents ? p.userId.registeredEvents.filter(e => e.status === 'completed').length : 0,
-            certificatesEarned: p.userId.certificates ? p.userId.certificates.length : 0
-          } : null
-        }
-      })) : [],
-      certificateDetails: event.certificates ? event.certificates.map(cert => ({
-        studentName: cert.userId.name,
-        studentId: cert.userId.studentId,
-        department: cert.userId.department,
-        year: cert.userId.year,
-        points: cert.userId.points,
-        issuedDate: cert.issuedDate,
-        certificateUrl: cert.certificateUrl
-      })) : []
-    }));
-
-    res.json(pastEventsWithDetails);
+    res.json(pastEvents);
   } catch (error) {
     console.error('Get past events error:', error);
     res.status(500).json({ message: 'Server error' });

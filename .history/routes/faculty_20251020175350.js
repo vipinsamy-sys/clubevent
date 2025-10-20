@@ -35,7 +35,7 @@ router.post('/login', [
     }
 
     // Check password
-    let isMatch = false;
+    module.exports = router;
     try {
       isMatch = await faculty.comparePassword ? await faculty.comparePassword(password) : false;
     } catch (_) {
@@ -63,48 +63,47 @@ router.post('/login', [
       process.env.JWT_SECRET || 'your_jwt_secret_key_here',
       { expiresIn: '7d' }
     );
+        const { studentId, clubName } = req.body;
 
-    res.json({
-      message: 'Faculty login successful',
-      token,
-      user: {
-        id: faculty._id,
-        name: faculty.name,
-        email: faculty.email,
-        role: faculty.role,
-        facultyId: faculty.facultyId,
-        department: faculty.department,
-        position: faculty.position,
-        clubName: faculty.clubName
-      }
-    });
-  } catch (error) {
-    console.error('Faculty login error:', error);
-    res.status(500).json({ message: 'Server error during login' });
-  }
-});
+        // Find the student
+        const student = await User.findById(studentId);
+        if (!student) {
+          return res.status(404).json({ message: 'Student not found' });
+        }
 
-// Get faculty dashboard stats
-router.get('/dashboard-stats', auth, async (req, res) => {
-  try {
-    if (req.user.role !== 'faculty') {
-      return res.status(403).json({ message: 'Access denied' });
-    }
+        // Check if student is already an admin
+        const existingAdmin = await Admin.findOne({ email: student.email });
+        if (existingAdmin) {
+          return res.status(400).json({ message: 'Student is already an admin' });
+        }
 
-    const totalEvents = await Event.countDocuments();
-    const totalStudents = await User.countDocuments({ role: 'student' });
-    const totalAdmins = await Admin.countDocuments();
-    const upcomingEvents = await Event.countDocuments({ status: 'upcoming' });
-    const completedEvents = await Event.countDocuments({ status: 'completed' });
+        // Create admin account
+        const admin = new Admin({
+          name: student.name,
+          email: student.email,
+          password: student.password, // Use the same password
+          clubName: clubName || 'General Club',
+          createdBy: req.user.id,
+          promotedFrom: student._id
+        });
 
-    res.json({
-      totalEvents,
-      totalStudents,
-      totalAdmins,
-      upcomingEvents,
-      completedEvents
-    });
-  } catch (error) {
+        await admin.save();
+
+        // Update student role to admin
+        student.role = 'admin';
+        student.isClubAdmin = true;
+        student.clubName = clubName || 'General Club';
+        await student.save();
+
+        res.json({
+          message: 'Student promoted to admin successfully',
+          admin: {
+            id: admin._id,
+            name: admin.name,
+            email: admin.email,
+            clubName: admin.clubName
+          }
+        });
     console.error('Dashboard stats error:', error);
     res.status(500).json({ message: 'Server error' });
   }
@@ -117,52 +116,12 @@ router.get('/events', auth, async (req, res) => {
       return res.status(403).json({ message: 'Access denied' });
     }
 
-    // Get events with rich details needed by the frontend
     const events = await Event.find()
-      .populate({
-        path: 'createdBy',
-        select: 'name email facultyId position clubName department'
-      })
-      .populate({
-        path: 'participants.userId',
-        select: 'name studentId department year phone points certificates registeredEvents'
-      })
-      .populate({
-        path: 'club',
-        select: 'name description'
-      })
-      .populate({
-        path: 'certificates.userId',
-        select: 'name studentId department year'
-      })
-      .lean()
-      .sort({ date: -1 });
+      .populate('createdBy', 'name email')
+      .populate('participants.userId', 'name studentId department year')
+      .sort({ createdAt: -1 });
 
-    // Enrich events with computed fields for the frontend
-    const eventsWithDetails = events.map(event => ({
-      ...event,
-      currentParticipants: event.participants ? event.participants.length : 0,
-      maxParticipants: event.maxParticipants || 100,
-      completedParticipants: event.participants ? event.participants.filter(p => p.status === 'completed').length : 0,
-      certificatesIssued: event.certificates ? event.certificates.length : 0,
-      createdBy: {
-        ...event.createdBy,
-        clubName: event.createdBy.clubName || event.clubName || 'General Club'
-      },
-      participants: event.participants ? event.participants.map(p => ({
-        ...p,
-        userId: {
-          ...p.userId,
-          progress: p.userId ? {
-            totalEvents: p.userId.registeredEvents ? p.userId.registeredEvents.length : 0,
-            completedEvents: p.userId.registeredEvents ? p.userId.registeredEvents.filter(e => e.status === 'completed').length : 0,
-            certificatesEarned: p.userId.certificates ? p.userId.certificates.length : 0
-          } : null
-        }
-      })) : []
-    }));
-
-    res.json(eventsWithDetails);
+    res.json(events);
   } catch (error) {
     console.error('Get events error:', error);
     res.status(500).json({ message: 'Server error' });
@@ -206,61 +165,12 @@ router.get('/past-events', auth, async (req, res) => {
       return res.status(403).json({ message: 'Access denied' });
     }
 
-    // Get completed events with full participant and certificate details
     const pastEvents = await Event.find({ status: 'completed' })
-      .populate({
-        path: 'createdBy',
-        select: 'name email facultyId position clubName department'
-      })
-      .populate({
-        path: 'participants.userId',
-        select: 'name studentId department year phone points certificates registeredEvents'
-      })
-      .populate({
-        path: 'club',
-        select: 'name description'
-      })
-      .populate({
-        path: 'certificates.userId',
-        select: 'name studentId department year points'
-      })
-      .lean()
+      .populate('createdBy', 'name email')
+      .populate('certificates.userId', 'name studentId')
       .sort({ date: -1 });
 
-    // Enrich past events with detailed completion and certificate information
-    const pastEventsWithDetails = pastEvents.map(event => ({
-      ...event,
-      currentParticipants: event.participants ? event.participants.length : 0,
-      maxParticipants: event.maxParticipants || 100,
-      certificatesIssued: event.certificates ? event.certificates.length : 0,
-      completedParticipants: event.participants ? event.participants.filter(p => p.status === 'completed').length : 0,
-      createdBy: {
-        ...event.createdBy,
-        clubName: event.createdBy.clubName || event.clubName || 'General Club'
-      },
-      participants: event.participants ? event.participants.map(p => ({
-        ...p,
-        userId: {
-          ...p.userId,
-          progress: p.userId ? {
-            totalEvents: p.userId.registeredEvents ? p.userId.registeredEvents.length : 0,
-            completedEvents: p.userId.registeredEvents ? p.userId.registeredEvents.filter(e => e.status === 'completed').length : 0,
-            certificatesEarned: p.userId.certificates ? p.userId.certificates.length : 0
-          } : null
-        }
-      })) : [],
-      certificateDetails: event.certificates ? event.certificates.map(cert => ({
-        studentName: cert.userId.name,
-        studentId: cert.userId.studentId,
-        department: cert.userId.department,
-        year: cert.userId.year,
-        points: cert.userId.points,
-        issuedDate: cert.issuedDate,
-        certificateUrl: cert.certificateUrl
-      })) : []
-    }));
-
-    res.json(pastEventsWithDetails);
+    res.json(pastEvents);
   } catch (error) {
     console.error('Get past events error:', error);
     res.status(500).json({ message: 'Server error' });
@@ -372,82 +282,85 @@ router.post('/promote', auth, async (req, res) => {
     if (req.user.role !== 'faculty') {
       return res.status(403).json({ message: 'Access denied' });
     }
-
++
     const { studentId, clubName } = req.body;
-
++
     // Find the student
     const student = await User.findById(studentId);
-    if (!student) {
-      return res.status(404).json({ message: 'Student not found' });
-    }
-
-    // Check if student is already an admin
-    const existingAdmin = await Admin.findOne({ email: student.email });
-    if (existingAdmin) {
-      return res.status(400).json({ message: 'Student is already an admin' });
-    }
-
-    // Create admin account
-    const admin = new Admin({
-      name: student.name,
-      email: student.email,
-      password: student.password, // Use the same password
-      clubName: clubName || 'General Club',
-      createdBy: req.user.id,
-      promotedFrom: student._id
-    });
-
-    await admin.save();
-
-    // Update student role to admin
-    student.role = 'admin';
-    student.isClubAdmin = true;
-    student.clubName = clubName || 'General Club';
-    await student.save();
-
-    res.json({
-      message: 'Student promoted to admin successfully',
-      admin: {
-        id: admin._id,
-        name: admin.name,
-        email: admin.email,
-        clubName: admin.clubName
-      }
-    });
-  } catch (error) {
-    console.error('Promote student error:', error);
-    res.status(500).json({ message: 'Server error' });
-  }
-});
-
++    if (!student) {
++      return res.status(404).json({ message: 'Student not found' });
++    }
++
++
++    // Check if student is already an admin
++
++    const existingAdmin = await Admin.findOne({ email: student.email });
++    if (existingAdmin) {
++      return res.status(400).json({ message: 'Student is already an admin' });
++    }
++
++    // Create admin account
++    const admin = new Admin({
++      name: student.name,
++      email: student.email,
++      password: student.password, // Use the same password
++      clubName: clubName || 'General Club',
++      createdBy: req.user.id,
++      promotedFrom: student._id
++    });
++
++    await admin.save();
++
++    // Update student role to admin
++    student.role = 'admin';
++    student.isClubAdmin = true;
++    student.clubName = clubName || 'General Club';
++    await student.save();
++
++    res.json({
++      message: 'Student promoted to admin successfully',
++      admin: {
++        id: admin._id,
++        name: admin.name,
++        email: admin.email,
++        clubName: admin.clubName
++      }
++    });
++  } catch (error) {
++    console.error('Promote student error:', error);
++    res.status(500).json({ message: 'Server error' });
++  }
++});
++
 // Remove admin
-router.delete('/admins/:adminId', auth, async (req, res) => {
-  try {
-    if (req.user.role !== 'faculty') {
-      return res.status(403).json({ message: 'Access denied' });
-    }
-
-    const admin = await Admin.findById(req.params.adminId);
-    if (!admin) {
-      return res.status(404).json({ message: 'Admin not found' });
-    }
-
-    // If admin was promoted from a student, revert their role
-    if (admin.promotedFrom) {
-      await User.findByIdAndUpdate(admin.promotedFrom, {
-        role: 'student',
-        isClubAdmin: false,
-        clubName: undefined
-      });
-    }
-
-    await Admin.findByIdAndDelete(req.params.adminId);
-
-    res.json({ message: 'Admin removed successfully' });
-  } catch (error) {
-    console.error('Remove admin error:', error);
-    res.status(500).json({ message: 'Server error' });
-  }
-});
-
++router.delete('/admins/:adminId', auth, async (req, res) => {
++  try {
++    if (req.user.role !== 'faculty') {
++      return res.status(403).json({ message: 'Access denied' });
++    }
++
++    const admin = await Admin.findById(req.params.adminId);
++    if (!admin) {
++      return res.status(404).json({ message: 'Admin not found' });
++    }
++
++    // If admin was promoted from a student, revert their role
++    if (admin.promotedFrom) {
++      await User.findByIdAndUpdate(admin.promotedFrom, {
++        role: 'student',
++        isClubAdmin: false,
++        clubName: undefined
++      });
++    }
++
++    await Admin.findByIdAndDelete(req.params.adminId);
++
++    res.json({ message: 'Admin removed successfully' });
++  } catch (error) {
++    console.error('Remove admin error:', error);
++    res.status(500).json({ message: 'Server error' });
++  }
++});
++
 module.exports = router;
++
