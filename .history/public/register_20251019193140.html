@@ -183,8 +183,7 @@ body {
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script>
-
-    document.getElementById('registerForm').addEventListener('submit', async function(e){
+document.getElementById('registerForm').addEventListener('submit', async function(e){
     e.preventDefault();
 
     const activeTab = document.querySelector('.tab-pane.active').id;
@@ -201,24 +200,24 @@ body {
 
     if(activeTab==='studentSection'){
         selectedRole='student';
-        confirmPassword=formData.get('confirmPasswordStudent'); // unique name
+        confirmPassword=formData.get('confirmPasswordStudent');
         registerData.studentId=formData.get('studentId');
         registerData.department=formData.get('department');
         registerData.year=formData.get('year');
     } else if(activeTab==='facultySection'){
         selectedRole='faculty';
-        confirmPassword=formData.get('confirmPasswordFaculty'); // unique name
+        confirmPassword=formData.get('confirmPasswordFaculty');
         registerData.facultyId=formData.get('facultyId');
-        registerData.department=formData.get('facultyDepartment'); // unique name
+        registerData.department=formData.get('department');
         registerData.position=formData.get('position');
     } else if(activeTab==='adminSection'){
         selectedRole='admin';
-        confirmPassword=formData.get('confirmPasswordAdmin'); // unique name
+        confirmPassword=formData.get('confirmPasswordAdmin');
         registerData.adminId=formData.get('adminId');
         registerData.clubName=formData.get('clubName');
     }
 
-    registerData.role = selectedRole; // important for backend routing
+    registerData.role = selectedRole;
 
     if(registerData.password !== confirmPassword){
         alert('Passwords do not match');
@@ -243,7 +242,6 @@ body {
         alert('Registration failed. Please try again.');
     }
 });
-
 </script>
 </body>
 </html>

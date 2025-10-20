@@ -80,10 +80,10 @@ router.post('/login', [
     }
 
     // Check password
-   if (admin.password !== password) {
-  return res.status(400).json({ message: 'Invalid credentials' });
-}
-
+    const isMatch = await admin.comparePassword(password);
+    if (!isMatch) {
+      return res.status(400).json({ message: 'Invalid credentials' });
+    }
 
     // Generate JWT token
     const token = jwt.sign(

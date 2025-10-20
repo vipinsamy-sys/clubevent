@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 
-const adminSchema = new mongoose.Schema({
+const facultySchema = new mongoose.Schema({
   name: {
     type: String,
     required: true,
@@ -17,18 +17,22 @@ const adminSchema = new mongoose.Schema({
     type: String,
     required: true
   },
-  clubName: {
-    type: String,
-    required: true
-  },
-  adminId: {
+  facultyId: {
     type: String,
     required: true,
     unique: true
   },
+  department: {
+    type: String,
+    required: true
+  },
+  position: {
+    type: String,
+    required: true
+  },
   role: {
     type: String,
-    default: 'admin'
+    default: 'faculty'
   },
   isActive: {
     type: Boolean,
@@ -36,4 +40,4 @@ const adminSchema = new mongoose.Schema({
   }
 });
 
-module.exports = mongoose.model('Admin', adminSchema);
+module.exports = mongoose.model('Faculty', facultySchema);

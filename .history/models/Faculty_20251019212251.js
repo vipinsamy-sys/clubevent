@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const bcrypt = require('bcryptjs');
 
 const facultySchema = new mongoose.Schema({
   name: {
@@ -56,8 +57,6 @@ const facultySchema = new mongoose.Schema({
 }, {
   timestamps: true
 });
-
-module.exports = mongoose.model('Faculty', facultySchema);
 
 
 

@@ -88,8 +88,9 @@ router.post('/login', [
       return res.status(400).json({ message: 'Invalid credentials' });
     }
 
-    // Check password (plaintext)
-    if (user.password !== password) {
+    // Check password
+    const isMatch = await user.comparePassword(password);
+    if (!isMatch) {
       return res.status(400).json({ message: 'Invalid credentials' });
     }
 
@@ -162,9 +163,10 @@ router.post('/student-login', [
     }
 
     // Check password
-if (user.password !== password) {
-  return res.status(400).json({ message: 'Invalid credentials' });
-}
+    const isMatch = await user.comparePassword(password);
+    if (!isMatch) {
+      return res.status(400).json({ message: 'Invalid credentials' });
+    }
 
     // Generate JWT token
     const token = jwt.sign(
@@ -218,9 +220,10 @@ router.post('/admin-login', [
     }
 
     // Check password
-   if (admin.password !== password) {
-  return res.status(400).json({ message: 'Invalid credentials' });
-}
+    const isMatch = await admin.comparePassword(password);
+    if (!isMatch) {
+      return res.status(400).json({ message: 'Invalid credentials' });
+    }
 
     // Generate JWT token
     const token = jwt.sign(
@@ -271,8 +274,27 @@ router.post('/faculty-login', [
       return res.status(400).json({ message: 'Account is deactivated' });
     }
 
-    // Check password (plaintext)
-    if (faculty.password !== password) {
+    // Check password
+    let isMatch = false;
+    try {
+      isMatch = await faculty.comparePassword(password);
+    } catch (_) {
+      isMatch = false;
+    }
+
+    // If password was stored in plaintext (e.g., manual DB insert),
+    // allow one-time migration: verify by direct equality, then hash and save.
+    if (!isMatch) {
+      const looksHashed = typeof faculty.password === 'string' && faculty.password.startsWith('$2');
+      if (!looksHashed && faculty.password === password) {
+        const bcrypt = require('bcryptjs');
+        faculty.password = await bcrypt.hash(password, 12);
+        await faculty.save();
+        isMatch = true;
+      }
+    }
+
+    if (!isMatch) {
       return res.status(400).json({ message: 'Invalid credentials' });
     }
 
